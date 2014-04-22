@@ -1,4 +1,3 @@
-
 param($filter_name,$filter_exp,[Int32]$warn=15,[Int32]$crit=5)
 $computer = $env:COMPUTERNAME
 $filter = "$filter_name='$filter_exp'"
@@ -13,9 +12,9 @@ Get-WmiObject -Class MSCluster_DiskPartition -Filter $filter -ComputerName $comp
         $free = ($_.FreeSpace/$_.TotalSize*100)
         $free = [math]::floor($free)
 
-        if ($free -le $crit){$ReturnCode=2}
-        elseif ($free -le $warn -and $ReturnCode -ne 2){$ReturnCode=1}
-        elseif ($free -gt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){$ReturnCode=0}
+        if ($free -ge $crit){$ReturnCode=2}
+        elseif ($free -ge $warn -and $ReturnCode -ne 2){$ReturnCode=1}
+        elseif ($free -lt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){$ReturnCode=0}
 
         Write-Host `" $_.VolumeLabel `" $_.Path "- Free Space :" $free% / $_.TotalSize MB
 
