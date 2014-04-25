@@ -1,4 +1,3 @@
-
 param($filter_name,$filter_exp,[Int32]$warn=85,[Int32]$crit=95)
 $computer = $env:COMPUTERNAME
 $filter = "$filter_name='$filter_exp'"
@@ -34,8 +33,8 @@ Get-WmiObject -Class MSCluster_DiskPartition -Filter $filter -ComputerName $comp
 
 if ($disk_exists -eq 0)
 {
-Write-Host Disk `"$filter`" does not exist
-exit 3
+	Write-Host Disk `"$filter`" does not exist
+	exit 3
 }
 
 
