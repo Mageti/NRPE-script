@@ -1,4 +1,5 @@
-param($filter_name,$filter_exp,[Int32]$warn=15,[Int32]$crit=5)
+
+param($filter_name,$filter_exp,[Int32]$warn=85,[Int32]$crit=95)
 $computer = $env:COMPUTERNAME
 $filter = "$filter_name='$filter_exp'"
 
@@ -12,11 +13,20 @@ Get-WmiObject -Class MSCluster_DiskPartition -Filter $filter -ComputerName $comp
         $free = ($_.FreeSpace/$_.TotalSize*100)
         $free = [math]::floor($free)
 
-        if ($free -ge $crit){$ReturnCode=2}
-        elseif ($free -ge $warn -and $ReturnCode -ne 2){$ReturnCode=1}
-        elseif ($free -lt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){$ReturnCode=0}
+        if ($free -ge $crit){
+		$ReturnCode=2
+	        Write-Host "DISK CRITICAL - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize  `($free%`)
+	}
+        elseif ($free -ge $warn -and $ReturnCode -ne 2){
+		$ReturnCode=1
+	        Write-Host "DISK WARNING - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
+	}
+        elseif ($free -lt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){
+		$ReturnCode=0
+	        Write-Host "DISK OK - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
+	}
 
-        Write-Host `" $_.VolumeLabel `" $_.Path "- Free Space :" $free% / $_.TotalSize MB
+        Write-Host "Free Space :" `" $_.VolumeLabel `" $_.Path $_.TotalSize MB  `($free%`)  `| "$($_.VolumeGuid)=$free%;$warn;$crit"
 
 	$disk_exists = 1
 }
