@@ -12,15 +12,15 @@ Get-WmiObject -Class MSCluster_DiskPartition -Filter $filter -ComputerName $comp
         $free = ($_.FreeSpace/$_.TotalSize*100)
         $free = [math]::floor($free)
 
-        if ($free -ge $crit){
+        if ($free -le $crit){
 		$ReturnCode=2
 	        Write-Host "DISK CRITICAL - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize  `($free%`)
 	}
-        elseif ($free -ge $warn -and $ReturnCode -ne 2){
+        elseif ($free -le $warn -and $ReturnCode -ne 2){
 		$ReturnCode=1
 	        Write-Host "DISK WARNING - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
 	}
-        elseif ($free -lt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){
+        elseif ($free -gt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){
 		$ReturnCode=0
 	        Write-Host "DISK OK - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
 	}
