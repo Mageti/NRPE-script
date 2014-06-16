@@ -1,4 +1,4 @@
-param($filter_name,$filter_exp,[Int32]$warn=85,[Int32]$crit=95)
+param($filter_name,$filter_exp,[Int32]$warn=15,[Int32]$crit=5)
 $computer = $env:COMPUTERNAME
 $filter = "$filter_name='$filter_exp'"
 
