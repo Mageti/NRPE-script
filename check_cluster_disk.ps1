@@ -1,4 +1,5 @@
-param($filter_name,$filter_exp,[Int32]$warn=15,[Int32]$crit=5)
+
+param($filter_name,$filter_exp,[Int32]$warn=85,[Int32]$crit=95)
 $computer = $env:COMPUTERNAME
 $filter = "$filter_name='$filter_exp'"
 
@@ -11,21 +12,24 @@ Get-WmiObject -Class MSCluster_DiskPartition -Filter $filter -ComputerName $comp
 
         $free = ($_.FreeSpace/$_.TotalSize*100)
         $free = [math]::floor($free)
+	$used = ($_.TotalSize-$_.FreeSpace)
+	$usedP = [math]::floor($used/$_.TotalSize*100)
+
 
         if ($free -le $crit){
 		$ReturnCode=2
-	        Write-Host "DISK CRITICAL - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize  `($free%`)
+	        Write-Host "CRITICAL - "`"$($_.VolumeLabel)`" $_.Path Total=$($_.TotalSize)MB, Used=$($used)MB `($usedP%`), Free=$($_.FreeSpace)MB `($free%`)
 	}
         elseif ($free -le $warn -and $ReturnCode -ne 2){
 		$ReturnCode=1
-	        Write-Host "DISK WARNING - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
+	        Write-Host "WARNING - "`"$($_.VolumeLabel)`" $_.Path Total=$($_.TotalSize)MB, Used=$($used)MB `($usedP%`), Free=$($_.FreeSpace)MB `($free%`)
 	}
         elseif ($free -gt $warn -and $ReturnCode -ne 2 -and $ReturnCode -ne 1){
 		$ReturnCode=0
-	        Write-Host "DISK OK - Free Space :"`"$($_.VolumeLabel)`" $_.Path $_.TotalSize MB  `($free%`)
+	        Write-Host "OK - "`"$($_.VolumeLabel)`" $_.Path Total=$($_.TotalSize)MB, Used=$($used)MB `($usedP%`), Free=$($_.FreeSpace)MB `($free%`)
 	}
 
-        Write-Host "Free Space :" `" $_.VolumeLabel `" $_.Path $_.TotalSize MB  `($free%`)  `| "$($_.VolumeGuid)=$free%;$warn;$crit"
+        Write-Host `"$($_.VolumeLabel)`" $_.Path Total=$($_.TotalSize)MB, Used=$($used)MB `($usedP%`), Free=$($_.FreeSpace)MB `($free%`)  `| "$($_.VolumeGuid)=$free%;$warn;$crit"
 
 	$disk_exists = 1
 }
